@@ -3,6 +3,15 @@ const input = document.querySelector("input")
 const form = document.querySelector('form')
 
 
+async function load() {
+    const res = await fetch("http://localhost:3000")
+        .then((data) => data.json());
+
+    res.urls.map(url => addElement(url))
+}
+
+load()
+
 function addElement({ name, url }) {
     const li = document.createElement('li')
     const a = document.createElement("a")
@@ -13,19 +22,32 @@ function addElement({ name, url }) {
     a.target = "_blank"
 
     trash.innerHTML = "x"
-    trash.onclick = () => removeElement(trash)
+    trash.onclick = () => removeElement(li)
 
     li.append(a)
     li.append(trash)
     ul.append(li)
 }
 
-function removeElement(el) {
-    if (confirm('Tem certeza que deseja deletar?'))
-        el.parentNode.remove()
+async function removeElement(el) {
+    if (confirm('Tem certeza que deseja deletar?')) {
+        const res = await fetch(
+            "http://localhost:3000?name=" + el.firstElementChild.getAttribute('innerText') +
+            "&url=" + el.firstElementChild.getAttribute('href') + "&del=1")
+        .then((data) => data.json());
+
+        if (String(res.message) === String('ok')) {
+            alert('URL deletada');
+            el.remove();
+        }
+        else
+        {
+            alert('Deleção não realizada');
+        }
+    }
 }
 
-form.addEventListener("submit", (event) => {
+form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     let { value } = input
@@ -41,7 +63,18 @@ form.addEventListener("submit", (event) => {
     if (!/^http/.test(url)) 
         return alert("Digite a url da maneira correta")
 
-    addElement({ name, url })
+    const res = await fetch("http://localhost:3000?name=" + name +
+        "&url=" + url)
+      .then((data) => data.json());
+
+    if (String(res.message) === String('ok')) {
+        alert('URL adicionada');
+        addElement({ name, url })
+    }
+    else
+    {
+        alert('Adição não realizada');
+    }
 
     input.value = ""
 })

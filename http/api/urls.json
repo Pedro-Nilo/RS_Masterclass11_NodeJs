@@ -9,8 +9,12 @@
       "url": "https://www.google.com"
     },
     {
-      "name": "Discord",
+      "name": "DIscord",
       "url": "https://www.discord.com"
+    },
+    {
+      "name": "Senai",
+      "url": "https://www.sp.senai.br"
     }
   ]
 }
